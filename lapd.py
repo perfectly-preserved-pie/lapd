@@ -42,35 +42,29 @@ def generate_column_definitions(dataframe: pd.DataFrame) -> list:
             "minWidth": 150,
             "resizable": True,
             "sortable": True,
-            "filter": True,
+            "filter": "agTextColumnFilter" if column == "Description" else True,
             "floatingFilter": True,
-            "suppressMenu": True
+            "suppressMenu": True,
+            "hide": column == "uuid",  # Hide the 'uuid' column
         }
-        # Pin the "Description" column to the left
         if column == "Description":
-            column_def["pinned"] = "left"
-        # Hide the "uuid" column
-        if column == "uuid":
-            column_def["hide"] = True
-        
+            column_def["pinned"] = "left"  # Pin 'Description' column
         column_defs.append(column_def)
     return column_defs
 
 column_defs = generate_column_definitions(df)
 
 app.layout = html.Div(
-    style={'height': '100vh', 'width': '100vw'},  # This will make the div take the entire viewport
+    className="ag-theme-alpine",
     children=[
         dag.AgGrid(
             id='grid',
             columnDefs=column_defs,
             rowData=df.to_dict('records'),
-            style={
-                'width': '100%',  # Makes the AgGrid component take the entire width of its parent
-                'height': '100%',  # Makes the AgGrid component take the entire height of its parent
-            },
+            style={'width': '100%', 'height': '100%'},
         ),
-    ]
+    ],
+    style={'height': '100vh'}  # Set the height of the grid to full viewport height
 )
 
 
