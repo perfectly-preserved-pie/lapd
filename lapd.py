@@ -19,6 +19,9 @@ df['uuid'] = [str(uuid.uuid4()) for _ in range(len(df))]
 # Drop the Item# column
 df = df.drop(columns=['Item#'])
 
+# Drop any rows that don't have a description
+df = df.dropna(subset=['Description'])
+
 app = Dash(__name__, external_stylesheets=external_stylesheets)
 
 def generate_column_definitions(dataframe: pd.DataFrame) -> list:
