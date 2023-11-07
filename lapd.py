@@ -23,7 +23,8 @@ app = Dash(__name__, external_stylesheets=external_stylesheets)
 
 def generate_column_definitions(dataframe: pd.DataFrame) -> list:
     """
-    Generates AG-Grid column definitions from a pandas DataFrame.
+    Generates AG-Grid column definitions from a pandas DataFrame, pinning the "Description" column
+    to the left and hiding the "uuid" column.
 
     Args:
         dataframe: A pandas DataFrame to generate column definitions from.
@@ -42,18 +43,33 @@ def generate_column_definitions(dataframe: pd.DataFrame) -> list:
             "floatingFilter": True,
             "suppressMenu": True
         }
+        # Pin the "Description" column to the left
+        if column == "Description":
+            column_def["pinned"] = "left"
+        # Hide the "uuid" column
+        if column == "uuid":
+            column_def["hide"] = True
+        
         column_defs.append(column_def)
     return column_defs
 
 column_defs = generate_column_definitions(df)
 
-app.layout = html.Div([
-    dag.AgGrid(
-        id='grid',
-        columnDefs=column_defs,
-        rowData=df.to_dict('records'),
-    ),
-])
+app.layout = html.Div(
+    style={'height': '100vh', 'width': '100vw'},  # This will make the div take the entire viewport
+    children=[
+        dag.AgGrid(
+            id='grid',
+            columnDefs=column_defs,
+            rowData=df.to_dict('records'),
+            style={
+                'width': '100%',  # Makes the AgGrid component take the entire width of its parent
+                'height': '100%',  # Makes the AgGrid component take the entire height of its parent
+            },
+        ),
+    ]
+)
+
 
 if __name__ == '__main__':
     app.run_server(debug=True)
